@@ -8,9 +8,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -172,20 +169,16 @@ fun BrowserScreen(
             )
 
             // Iconic Floating Yellow Download FAB
-            AnimatedVisibility(
-                visible = mediaDetectedUrl != null,
-                enter = scaleIn(),
-                exit = scaleOut(),
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 72.dp, end = 20.dp)
-            ) {
+            if (mediaDetectedUrl != null) {
                 FloatingActionButton(
                     onClick = { mediaDetectedUrl?.let { onDownloadDetected(it) } },
                     containerColor = SnapYellow,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape,
-                    modifier = Modifier.size(56.dp)
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 72.dp, end = 20.dp)
+                        .size(56.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Download,

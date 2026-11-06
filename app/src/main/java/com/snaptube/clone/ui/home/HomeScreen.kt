@@ -232,7 +232,7 @@ fun HomeScreen(
 private fun createDefaultFormats(id: String): List<FormatOption> = listOf(
     FormatOption("mp3_128k", MediaType.AUDIO, "MP3 128K", "Standard audio", "mp3", 3_500_000L, "https://stream.local/$id.mp3"),
     FormatOption("m4a_128k", MediaType.AUDIO, "M4A 128K", "Best for mobile", "m4a", 3_200_000L, "https://stream.local/$id.m4a"),
-    FormatOption("mp4_360p", MediaType.VIDEO, "360P", "Data saver", "mp4", 12_000_000L, "https://stream.local/$id_360.mp4"),
-    FormatOption("mp4_720p", MediaType.VIDEO, "720P HD", "HD quality", "mp4", 35_000_000L, "https://stream.local/$id_720.mp4", isHd = true),
-    FormatOption("mp4_1080p", MediaType.VIDEO, "1080P FHD", "Full HD", "mp4", 68_000_000L, "https://stream.local/$id_1080.mp4", isHd = true)
+    FormatOption("mp4_360p", MediaType.VIDEO, "360P", "Data saver", "mp4", 12_000_000L, "https://stream.local/${id}_360.mp4"),
+    FormatOption("mp4_720p", MediaType.VIDEO, "720P HD", "HD quality", "mp4", 35_000_000L, "https://stream.local/${id}_720.mp4", isHd = true),
+    FormatOption("mp4_1080p", MediaType.VIDEO, "1080P FHD", "Full HD", "mp4", 68_000_000L, "https://stream.local/${id}_1080.mp4", isHd = true)
 )

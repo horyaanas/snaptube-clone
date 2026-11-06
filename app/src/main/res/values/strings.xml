@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SnapTube</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_browser">Browser</string>
+    <string name="tab_downloads">My Files</string>
+    <string name="tab_tools">Tools</string>
+    <string name="tab_me">Me</string>
+
+    <string name="search_hint">Search or enter URL...</string>
+    <string name="trending">Trending</string>
+    <string name="recommended">Recommended For You</string>
+    <string name="speed_dial">Sites</string>
+
+    <!-- Formats -->
+    <string name="download_as_music">Music</string>
+    <string name="download_as_video">Video</string>
+    <string name="format_mp3_128k">MP3 128K</string>
+    <string name="format_mp3_160k">MP3 160K</string>
+    <string name="format_m4a">M4A (128K)</string>
+    <string name="format_360p">360P</string>
+    <string name="format_720p">720P HD</string>
+    <string name="format_1080p">1080P FHD</string>
+
+    <!-- Downloads -->
+    <string name="downloading">Downloading</string>
+    <string name="finished">Finished</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Tools -->
+    <string name="whatsapp_status_saver">WhatsApp Status Saver</string>
+    <string name="vault_title">Private Vault</string>
+    <string name="clean_junk">Clean Junk Files</string>
+    <string name="phone_boost">Phone Boost</string>
+</resources>

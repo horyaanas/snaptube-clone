@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- SnapTube Brand Palette -->
+    <color name="snap_yellow">#FFBB00</color>
+    <color name="snap_yellow_variant">#FFA000</color>
+    <color name="snap_black">#121212</color>
+    <color name="snap_dark_surface">#1E1E1E</color>
+    <color name="snap_card_dark">#282828</color>
+    <color name="snap_light_bg">#F6F7F9</color>
+    <color name="snap_white">#FFFFFF</color>
+    <color name="snap_gray_text">#8E8E93</color>
+    <color name="snap_gray_light">#E5E5EA</color>
+    <color name="snap_red_accent">#FF3B30</color>
+    <color name="snap_green_accent">#34C759</color>
+</resources>

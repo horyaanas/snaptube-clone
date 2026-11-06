@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">سناب تيوب</string>
+    <string name="tab_home">الرئيسية</string>
+    <string name="tab_browser">المتصفح</string>
+    <string name="tab_downloads">ملفاتي</string>
+    <string name="tab_tools">الأدوات</string>
+    <string name="tab_me">أنا</string>
+
+    <string name="search_hint">ابحث أو أدخل رابط الفيديو...</string>
+    <string name="trending">المحتوى الرائج</string>
+    <string name="recommended">موصى به لك</string>
+    <string name="speed_dial">المواقع الشهيرة</string>
+
+    <!-- Formats -->
+    <string name="download_as_music">موسيقى</string>
+    <string name="download_as_video">فيديو</string>
+    <string name="format_mp3_128k">MP3 (128K) جودة عادية</string>
+    <string name="format_mp3_160k">MP3 (160K) جودة عالية</string>
+    <string name="format_m4a">M4A (128K) الأفضل للتشغيل على الهاتف</string>
+    <string name="format_360p">360P جودة منخفضة</string>
+    <string name="format_720p">720P HD عالية الدقة</string>
+    <string name="format_1080p">1080P FHD فائقة الدقة</string>
+
+    <!-- Downloads -->
+    <string name="downloading">قيد التنزيل</string>
+    <string name="finished">مكتمل</string>
+    <string name="pause">إيقاف مؤقت</string>
+    <string name="resume">استئناف</string>
+    <string name="cancel">إلغاء</string>
+
+    <!-- Tools -->
+    <string name="whatsapp_status_saver">حافظ حالات واتساب</string>
+    <string name="vault_title">الخزنة الخاصة</string>
+    <string name="clean_junk">تنظيف الملفات غير الهامة</string>
+    <string name="phone_boost">تسريع الهاتف</string>
+</resources>

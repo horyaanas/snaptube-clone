@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Refresh
@@ -58,7 +59,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,6 +91,7 @@ fun DownloadTabScreen(
     onSearch: (String) -> Unit,
     onOpenUrl: (String) -> Unit,
     onOpenVideo: (VideoDetails) -> Unit,
+    onDownloadVideo: (VideoDetails) -> Unit,
     onOpenTool: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -127,12 +131,14 @@ fun DownloadTabScreen(
             HomeTab.YOUTUBE -> FeedContent(
                 title = stringResource(R.string.trending),
                 musicOnly = false,
-                onOpenVideo = onOpenVideo
+                onOpenVideo = onOpenVideo,
+                onDownloadVideo = onDownloadVideo
             )
             HomeTab.MUSIC -> FeedContent(
                 title = stringResource(R.string.home_music),
                 musicOnly = true,
-                onOpenVideo = onOpenVideo
+                onOpenVideo = onOpenVideo,
+                onDownloadVideo = onDownloadVideo
             )
             HomeTab.MORE -> MoreContent(onOpenUrl = onOpenUrl, onOpenTool = onOpenTool)
         }
@@ -146,13 +152,21 @@ private fun SearchHomeContent(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     var history by remember { mutableStateOf(AppPreferences.searchHistory) }
 
     fun submit(text: String = query) {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return
-        AppPreferences.addSearchHistory(trimmed)
-        onSearch(trimmed)
+        val extractedUrl = MediaRepository.extractUrlFromText(trimmed)
+        if (extractedUrl != null && MediaRepository.looksLikeUrl(extractedUrl)) {
+            onSearch(extractedUrl)
+        } else if (MediaRepository.looksLikeUrl(trimmed)) {
+            onSearch(trimmed)
+        } else {
+            AppPreferences.addSearchHistory(trimmed)
+            onSearch(trimmed)
+        }
     }
 
     LazyColumn(
@@ -184,6 +198,23 @@ private fun SearchHomeContent(
                         if (query.isNotEmpty()) {
                             IconButton(onClick = { query = "" }) {
                                 Icon(Icons.Default.Close, contentDescription = null)
+                            }
+                        } else {
+                            IconButton(
+                                onClick = {
+                                    clipboard.getText()?.text?.trim()
+                                        ?.takeIf { it.isNotBlank() }
+                                        ?.let { pasted ->
+                                            query = pasted
+                                            submit(pasted)
+                                        }
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.ContentPaste,
+                                    contentDescription = stringResource(R.string.paste),
+                                    tint = SnapYellow
+                                )
                             }
                         }
                     },
@@ -406,29 +437,25 @@ private fun HotSearchRow(onSelect: (String) -> Unit) {
 private fun FeedContent(
     title: String,
     musicOnly: Boolean,
-    onOpenVideo: (VideoDetails) -> Unit
+    onOpenVideo: (VideoDetails) -> Unit,
+    onDownloadVideo: (VideoDetails) -> Unit
 ) {
     var feedItems by remember { mutableStateOf<List<VideoDetails>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     var refreshKey by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(refreshKey, musicOnly) {
         loading = true
-        error = false
+        errorMessage = null
         val result = if (musicOnly) {
-            MediaRepository.searchMusic("trending music 2026")
+            MediaRepository.searchMusic("trending music")
         } else {
             MediaRepository.trending()
         }
         loading = false
         result.onSuccess { feedItems = it }
-            .onFailure {
-                error = true
-                if (!musicOnly) {
-                    MediaRepository.search("trending videos").onSuccess { feedItems = it }
-                }
-            }
+            .onFailure { errorMessage = it.message ?: " " }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -458,7 +485,7 @@ private fun FeedContent(
             loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = SnapYellow)
             }
-            error && feedItems.isEmpty() -> Box(
+            errorMessage != null && feedItems.isEmpty() -> Box(
                 Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
@@ -466,6 +493,13 @@ private fun FeedContent(
                     Text(
                         text = stringResource(R.string.error_generic),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = errorMessage.orEmpty(),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 11.sp,
+                        maxLines = 3
                     )
                     Spacer(Modifier.height(10.dp))
                     Button(onClick = { refreshKey++ }) {
@@ -487,7 +521,7 @@ private fun FeedContent(
                     VideoCard(
                         video = video,
                         onVideoClick = { onOpenVideo(video) },
-                        onDownloadClick = { onOpenVideo(video) }
+                        onDownloadClick = { onDownloadVideo(video) }
                     )
                     Spacer(Modifier.height(8.dp))
                 }

@@ -12,6 +12,7 @@ import com.snaptube.clone.data.model.MediaType
 import com.snaptube.clone.data.model.VideoDetails
 import com.snaptube.clone.data.prefs.AppPreferences
 import com.snaptube.clone.data.storage.DownloadStorage
+import com.snaptube.clone.data.extractor.MediaRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -205,27 +206,42 @@ object DownloadManager {
     // ------------------------------------------------------------------
 
     private fun startTask(taskId: String) {
-        if (activeJobs.containsKey(taskId)) return
+        if (activeJobs[taskId]?.isActive == true) return
 
         val job = scope.launch {
-            val initial = _tasks.value.firstOrNull { it.id == taskId } ?: return@launch
-            if (AppPreferences.wifiOnly && !isOnWifi()) {
-                updateTask(taskId) {
-                    it.copy(status = DownloadStatus.FAILED, errorMessage = "Wi-Fi required")
-                }
-                saveHistory()
-                return@launch
+            try {
+                runTask(taskId)
+            } finally {
+                activeJobs.remove(taskId)
             }
+        }
+        activeJobs[taskId] = job
+    }
 
+    private suspend fun runTask(taskId: String) {
+        val initial = _tasks.value.firstOrNull { it.id == taskId } ?: return
+        if (AppPreferences.wifiOnly && !isOnWifi()) {
             updateTask(taskId) {
-                it.copy(status = DownloadStatus.DOWNLOADING, downloadSpeedBps = 0, errorMessage = null)
+                it.copy(status = DownloadStatus.FAILED, errorMessage = "Wi-Fi required")
             }
+            saveHistory()
+            return
+        }
 
-            val format = initial.format
-            val finalFile = File(initial.targetFilePath)
-            finalFile.parentFile?.mkdirs()
-            val workingDir = tempDir()
-            val baseName = finalFile.nameWithoutExtension
+        updateTask(taskId) {
+            it.copy(status = DownloadStatus.DOWNLOADING, downloadSpeedBps = 0, errorMessage = null)
+        }
+
+        val finalFile = File(initial.targetFilePath)
+        finalFile.parentFile?.mkdirs()
+        val workingDir = tempDir()
+        val baseName = finalFile.nameWithoutExtension
+
+        var attempts = 0
+        while (true) {
+            attempts++
+            val currentTask = _tasks.value.firstOrNull { it.id == taskId } ?: return
+            val format = currentTask.format
 
             try {
                 val wantsMux = format.type == MediaType.VIDEO &&
@@ -272,6 +288,7 @@ object DownloadManager {
                     )
                 }
                 saveHistory()
+                return
             } catch (c: CancellationException) {
                 // Paused / cancelled: keep partial files for resume.
                 updateTask(taskId) {
@@ -282,7 +299,17 @@ object DownloadManager {
                     }
                 }
                 saveHistory()
+                return
             } catch (t: Throwable) {
+                // CDN links expire quickly: on 403/410 resolve the page again
+                // once and retry with a fresh, signed URL.
+                if (attempts < 2 && isExpiredLink(t) && currentTask.sourceUrl.isNotBlank()) {
+                    val replacement = refreshFormat(currentTask.sourceUrl, format)
+                    if (replacement != null) {
+                        updateTask(taskId) { it.copy(format = replacement) }
+                        continue
+                    }
+                }
                 updateTask(taskId) {
                     it.copy(
                         status = DownloadStatus.FAILED,
@@ -291,12 +318,23 @@ object DownloadManager {
                     )
                 }
                 saveHistory()
-            } finally {
-                activeJobs.remove(taskId)
+                return
             }
         }
+    }
 
-        activeJobs[taskId] = job
+    private fun isExpiredLink(t: Throwable): Boolean {
+        val message = t.message.orEmpty()
+        return message.contains("403") || message.contains("410") || message.contains("Forbidden")
+    }
+
+    private suspend fun refreshFormat(sourceUrl: String, oldFormat: FormatOption): FormatOption? {
+        val details = MediaRepository.extract(sourceUrl).getOrNull() ?: return null
+        return details.formats.firstOrNull { it.id == oldFormat.id }
+            ?: details.formats.firstOrNull {
+                it.type == oldFormat.type && it.qualityLabel == oldFormat.qualityLabel
+            }
+            ?: details.formats.firstOrNull { it.type == oldFormat.type }
     }
 
     private suspend fun downloadDirect(

@@ -158,39 +158,82 @@ private fun MainApp(
     var videoForFormat by remember { mutableStateOf<VideoDetails?>(null) }
     var isExtracting by remember { mutableStateOf(false) }
     var extractingTitle by remember { mutableStateOf("") }
+    var extractionError by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var clipboardUrl by remember { mutableStateOf<String?>(null) }
+    var lastClipboardHandled by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     fun openUrl(url: String) {
-        if (url.isBlank()) return
-        if (MediaRepository.isPlaylistUrl(url)) {
+        val normalized = MediaRepository.normalizeUrl(url)
+        if (normalized.isBlank() || !MediaRepository.looksLikeUrl(normalized)) return
+        if (MediaRepository.isPlaylistUrl(normalized)) {
             scope.launch {
                 isExtracting = true
-                extractingTitle = url
-                val result = MediaRepository.extractPlaylist(url)
+                extractingTitle = normalized
+                val result = MediaRepository.extractPlaylist(normalized)
                 isExtracting = false
                 result.onSuccess { route = Route.Playlist(it) }
                     .onFailure {
-                        Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show()
-                        route = Route.Web(url)
+                        extractionError = normalized to (it.message.orEmpty())
                     }
             }
-        } else if (MediaRepository.isSupportedUrl(url)) {
+        } else if (MediaRepository.isSupportedUrl(normalized)) {
             scope.launch {
                 isExtracting = true
-                extractingTitle = url
-                val result = MediaRepository.extract(url)
+                extractingTitle = normalized
+                val result = MediaRepository.extract(normalized)
                 isExtracting = false
                 result.onSuccess { route = Route.Detail(it) }
                     .onFailure {
-                        Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show()
-                        route = Route.Web(url)
+                        extractionError = normalized to (it.message.orEmpty())
                     }
             }
         } else {
-            route = Route.Web(url)
+            extractionError = normalized to context.getString(R.string.unsupported_link)
+        }
+    }
+
+    /** The card download button: extract first, then show the format sheet. */
+    fun downloadVideo(video: VideoDetails) {
+        if (video.webpageUrl.isBlank()) return
+        scope.launch {
+            isExtracting = true
+            extractingTitle = video.webpageUrl
+            val result = MediaRepository.extract(video.webpageUrl)
+            isExtracting = false
+            if (result.isSuccess && result.getOrNull()?.formats?.isNotEmpty() == true) {
+                videoForFormat = result.getOrNull()
+            } else if (result.isSuccess) {
+                // Extraction worked but found no downloadable formats.
+                extractionError = video.webpageUrl to context.getString(R.string.error_generic)
+            } else {
+                extractionError = video.webpageUrl to (result.exceptionOrNull()?.message.orEmpty())
+            }
+        }
+    }
+
+    // Like the original SnapTube: when a supported link is copied anywhere,
+    // offer to download it right away.
+    val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+        as? android.content.ClipboardManager
+    androidx.compose.runtime.DisposableEffect(clipboardManager) {
+        val listener = android.content.ClipboardManager.OnPrimaryClipChangedListener {
+            val text = runCatching {
+                clipboardManager?.primaryClip?.getItemAt(0)?.text?.toString()
+            }.getOrNull()
+            val url = text?.let { MediaRepository.extractUrlFromText(it) }
+            if (url != null && url != lastClipboardHandled &&
+                MediaRepository.isSupportedUrl(url)
+            ) {
+                clipboardUrl = url
+            }
+        }
+        clipboardManager?.addPrimaryClipChangedListener(listener)
+        onDispose {
+            clipboardManager?.removePrimaryClipChangedListener(listener)
         }
     }
 
@@ -226,14 +269,16 @@ private fun MainApp(
                     Route.Main -> when (tabIndex) {
                         0 -> DownloadTabScreen(
                             onSearch = { query ->
-                                if (query.startsWith("http://") || query.startsWith("https://")) {
-                                    openUrl(query)
+                                val url = MediaRepository.extractUrlFromText(query)
+                                if (url != null && MediaRepository.looksLikeUrl(url)) {
+                                    openUrl(url)
                                 } else {
                                     route = Route.Search(query)
                                 }
                             },
                             onOpenUrl = ::openUrl,
                             onOpenVideo = { video -> openUrl(video.webpageUrl) },
+                            onDownloadVideo = ::downloadVideo,
                             onOpenTool = { tool -> route = Route.Tool(tool) }
                         )
                         1 -> FilesScreen(
@@ -252,6 +297,7 @@ private fun MainApp(
                         query = current.query,
                         onBack = { route = Route.Main },
                         onOpenVideo = { video -> openUrl(video.webpageUrl) },
+                        onDownloadVideo = ::downloadVideo,
                         onOpenWeb = { url -> route = Route.Web(url) }
                     )
 
@@ -315,6 +361,68 @@ private fun MainApp(
                     videoForFormat = null
                     tabIndex = 1
                     route = Route.Main
+                }
+            )
+        }
+
+        clipboardUrl?.let { url ->
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = {
+                    clipboardUrl = null
+                    lastClipboardHandled = url
+                },
+                title = { Text(stringResource(R.string.clipboard_title)) },
+                text = { Text(stringResource(R.string.clipboard_msg)) },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = {
+                            clipboardUrl = null
+                            lastClipboardHandled = url
+                            openUrl(url)
+                        }
+                    ) {
+                        Text(stringResource(R.string.download_now))
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = {
+                            clipboardUrl = null
+                            lastClipboardHandled = url
+                        }
+                    ) {
+                        Text(stringResource(R.string.close))
+                    }
+                }
+            )
+        }
+
+        extractionError?.let { (url, message) ->
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { extractionError = null },
+                title = { Text(stringResource(R.string.error_title)) },
+                text = {
+                    Text(
+                        (message.ifBlank { stringResource(R.string.error_generic) }) +
+                            "\n\n$url"
+                    )
+                },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = {
+                            extractionError = null
+                            route = Route.Web(url)
+                        }
+                    ) {
+                        Text(stringResource(R.string.open_browser))
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { extractionError = null }
+                    ) {
+                        Text(stringResource(R.string.close))
+                    }
                 }
             )
         }

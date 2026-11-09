@@ -164,4 +164,14 @@
     <string name="folder_selected">تم تحديث مجلد التنزيل</string>
     <string name="folder_error">تعذر الوصول إلى هذا المجلد</string>
     <string name="folder_reset">ستعود التنزيلات إلى تخزين التطبيق</string>
+
+    <!-- Link capture / errors -->
+    <string name="clipboard_title">تم اكتشاف رابط</string>
+    <string name="clipboard_msg">تم نسخ رابط فيديو إلى الحافظة. هل تريد تنزيله الآن؟</string>
+    <string name="download_now">تنزيل الآن</string>
+    <string name="close">إغلاق</string>
+    <string name="error_title">حدث خطأ</string>
+    <string name="open_browser">فتح في المتصفح</string>
+    <string name="unsupported_link">هذا الرابط غير مدعوم</string>
+    <string name="paste">لصق</string>
 </resources>

@@ -164,4 +164,14 @@
     <string name="folder_selected">Download folder updated</string>
     <string name="folder_error">Could not access this folder</string>
     <string name="folder_reset">Downloads will use app storage again</string>
+
+    <!-- Link capture / errors -->
+    <string name="clipboard_title">Link detected</string>
+    <string name="clipboard_msg">A video link was copied to your clipboard. Download it now?</string>
+    <string name="download_now">Download now</string>
+    <string name="close">Close</string>
+    <string name="error_title">Something went wrong</string>
+    <string name="open_browser">Open in browser</string>
+    <string name="unsupported_link">This link is not supported</string>
+    <string name="paste">Paste</string>
 </resources>

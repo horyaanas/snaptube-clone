@@ -50,21 +50,22 @@ fun SearchResultsScreen(
     query: String,
     onBack: () -> Unit,
     onOpenVideo: (VideoDetails) -> Unit,
+    onDownloadVideo: (VideoDetails) -> Unit,
     onOpenWeb: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var results by remember { mutableStateOf<List<VideoDetails>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
-    var failed by remember { mutableStateOf(false) }
+    var failureMessage by remember { mutableStateOf<String?>(null) }
     var refreshKey by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(query, refreshKey) {
         loading = true
-        failed = false
+        failureMessage = null
         AppPreferences.addSearchHistory(query)
         MediaRepository.search(query)
             .onSuccess { results = it }
-            .onFailure { failed = true }
+            .onFailure { failureMessage = it.message ?: " " }
         loading = false
     }
 
@@ -109,7 +110,7 @@ fun SearchResultsScreen(
                 CircularProgressIndicator(color = SnapYellow)
             }
 
-            failed && results.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            failureMessage != null && results.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -117,6 +118,12 @@ fun SearchResultsScreen(
                     Text(
                         text = stringResource(R.string.error_generic),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = failureMessage.orEmpty(),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 11.sp,
+                        maxLines = 3
                     )
                     Button(onClick = { refreshKey++ }) {
                         Text(stringResource(R.string.retry))
@@ -149,7 +156,7 @@ fun SearchResultsScreen(
                     VideoCard(
                         video = video,
                         onVideoClick = { onOpenVideo(video) },
-                        onDownloadClick = { onOpenVideo(video) }
+                        onDownloadClick = { onDownloadVideo(video) }
                     )
                     Spacer(Modifier.height(8.dp))
                 }

@@ -66,6 +66,11 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="*.youtube.com" />
                 <data android:scheme="https" android:host="youtu.be" />
+                <data android:scheme="https" android:host="*.youtube-nocookie.com" />
+                <data android:scheme="https" android:host="*.tiktok.com" />
+                <data android:scheme="https" android:host="*.instagram.com" />
+                <data android:scheme="https" android:host="*.soundcloud.com" />
+                <data android:scheme="https" android:host="t.me" />
             </intent-filter>
         </activity>
 

@@ -120,4 +120,48 @@
     <string name="storage_free">المساحة المتاحة</string>
     <string name="clean_now">تنظيف الآن</string>
     <string name="no_large_files">لا توجد ملفات كبيرة</string>
+
+    <!-- Playlist batch download -->
+    <string name="playlist">قائمة التشغيل</string>
+    <string name="playlist_items">%1$d عنصر</string>
+    <string name="batch_mode">نوع التنزيل</string>
+    <string name="batch_quality">جودة الفيديو</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="download_selected">تنزيل المحدد (%1$d)</string>
+    <string name="batch_preparing">جارٍ تجهيز %1$d من %2$d…</string>
+    <string name="batch_downloading">جارٍ تجهيز التنزيلات…</string>
+    <string name="batch_finished">بدأ تنزيل %1$d ملفات</string>
+
+    <!-- MP3 conversion / background playback -->
+    <string name="converting">جارٍ التحويل إلى MP3…</string>
+    <string name="conversion_done">اكتمل التحويل إلى MP3</string>
+    <string name="conversion_failed">تعذر تحويل هذا الملف إلى MP3</string>
+    <string name="convert_to_mp3">تحويل إلى MP3</string>
+    <string name="play_in_background">تشغيل في الخلفية</string>
+
+    <!-- History -->
+    <string name="history">السجل</string>
+    <string name="history_empty">لا يوجد سجل تنزيلات بعد</string>
+    <string name="copy_link">نسخ الرابط</string>
+    <string name="link_copied">تم نسخ الرابط</string>
+    <string name="no_link">لا يوجد رابط لهذا العنصر</string>
+    <string name="redownload">إعادة التنزيل</string>
+    <string name="merging">جارٍ الدمج</string>
+
+    <!-- Backup / custom folder -->
+    <string name="settings_backup">النسخ الاحتياطي والاستعادة</string>
+    <string name="backup">نسخ احتياطي</string>
+    <string name="backup_desc">تصدير الإعدادات وسجل التنزيلات إلى ملف JSON</string>
+    <string name="restore">استعادة</string>
+    <string name="restore_desc">استيراد الإعدادات وسجل التنزيلات من نسخة احتياطية</string>
+    <string name="backup_done">تم حفظ النسخة الاحتياطية</string>
+    <string name="backup_failed">تعذر حفظ النسخة الاحتياطية</string>
+    <string name="restore_done">تمت الاستعادة</string>
+    <string name="restore_failed">تعذرت استعادة هذه النسخة</string>
+    <string name="settings_download_folder">مجلد التنزيل</string>
+    <string name="app_folder">تخزين التطبيق</string>
+    <string name="reset_folder">استخدام تخزين التطبيق</string>
+    <string name="folder_selected">تم تحديث مجلد التنزيل</string>
+    <string name="folder_error">تعذر الوصول إلى هذا المجلد</string>
+    <string name="folder_reset">ستعود التنزيلات إلى تخزين التطبيق</string>
 </resources>

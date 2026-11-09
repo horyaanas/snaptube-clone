@@ -63,6 +63,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.documentfile)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
@@ -87,6 +88,9 @@ dependencies {
 
     // Real streaming-site extractors (YouTube, SoundCloud, PeerTube, Bandcamp, MediaCCC)
     implementation(libs.newpipe.extractor)
+
+    // Real MP3 encoding (pure-Java LAME port)
+    implementation(libs.jump3r)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

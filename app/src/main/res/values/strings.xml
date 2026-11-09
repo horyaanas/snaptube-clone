@@ -120,4 +120,48 @@
     <string name="storage_free">Free space</string>
     <string name="clean_now">Clean now</string>
     <string name="no_large_files">No large files found</string>
+
+    <!-- Playlist batch download -->
+    <string name="playlist">Playlist</string>
+    <string name="playlist_items">%1$d items</string>
+    <string name="batch_mode">Download type</string>
+    <string name="batch_quality">Video quality</string>
+    <string name="select_all">Select all</string>
+    <string name="download_selected">Download selected (%1$d)</string>
+    <string name="batch_preparing">Preparing %1$d of %2$d…</string>
+    <string name="batch_downloading">Preparing downloads…</string>
+    <string name="batch_finished">%1$d downloads started</string>
+
+    <!-- MP3 conversion / background playback -->
+    <string name="converting">Converting to MP3…</string>
+    <string name="conversion_done">MP3 conversion complete</string>
+    <string name="conversion_failed">Could not convert this file to MP3</string>
+    <string name="convert_to_mp3">Convert to MP3</string>
+    <string name="play_in_background">Play in background</string>
+
+    <!-- History -->
+    <string name="history">History</string>
+    <string name="history_empty">No download history yet</string>
+    <string name="copy_link">Copy link</string>
+    <string name="link_copied">Link copied</string>
+    <string name="no_link">No link available for this item</string>
+    <string name="redownload">Download again</string>
+    <string name="merging">Merging</string>
+
+    <!-- Backup / custom folder -->
+    <string name="settings_backup">Backup &amp; restore</string>
+    <string name="backup">Back up data</string>
+    <string name="backup_desc">Export settings and download history to a JSON file</string>
+    <string name="restore">Restore data</string>
+    <string name="restore_desc">Import settings and download history from a backup</string>
+    <string name="backup_done">Backup saved</string>
+    <string name="backup_failed">Could not save the backup</string>
+    <string name="restore_done">Backup restored</string>
+    <string name="restore_failed">Could not restore this backup</string>
+    <string name="settings_download_folder">Download folder</string>
+    <string name="app_folder">App storage</string>
+    <string name="reset_folder">Use app storage</string>
+    <string name="folder_selected">Download folder updated</string>
+    <string name="folder_error">Could not access this folder</string>
+    <string name="folder_reset">Downloads will use app storage again</string>
 </resources>

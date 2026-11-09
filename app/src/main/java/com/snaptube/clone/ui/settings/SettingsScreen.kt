@@ -2,6 +2,9 @@ package com.snaptube.clone.ui.settings
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.BatterySaver
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.DarkMode
@@ -33,6 +37,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Chat
@@ -53,6 +58,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,8 +70,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.snaptube.clone.BuildConfig
 import com.snaptube.clone.R
+import com.snaptube.clone.data.backup.BackupManager
 import com.snaptube.clone.data.prefs.AppPreferences
+import com.snaptube.clone.data.storage.DownloadStorage
 import com.snaptube.clone.ui.theme.SnapYellow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun SettingsScreen(
@@ -81,6 +95,63 @@ fun SettingsScreen(
     var showAboutDialog by remember { mutableStateOf(false) }
     var notifications by remember { mutableStateOf(AppPreferences.notificationsEnabled) }
     var themeMode by remember { mutableIntStateOf(AppPreferences.themeMode) }
+    var folderVersion by remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
+
+    val folderLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            val ok = runCatching { DownloadStorage.persist(context, uri) }.isSuccess
+            folderVersion++
+            Toast.makeText(
+                context,
+                if (ok) R.string.folder_selected else R.string.folder_error,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    val backupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val ok = runCatching {
+                withContext(Dispatchers.IO) {
+                    BackupManager.writeToUri(context, uri, BackupManager.exportJson())
+                }
+            }.isSuccess
+            Toast.makeText(
+                context,
+                if (ok) R.string.backup_done else R.string.backup_failed,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    val restoreLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val result = runCatching {
+                withContext(Dispatchers.IO) {
+                    val json = BackupManager.readFromUri(context, uri)
+                    BackupManager.restoreJson(json)
+                }
+            }
+            result.onSuccess { restored ->
+                notifications = AppPreferences.notificationsEnabled
+                themeMode = AppPreferences.themeMode
+                onThemeChanged(AppPreferences.themeMode)
+                Toast.makeText(context, R.string.restore_done, Toast.LENGTH_SHORT).show()
+                if (restored.languageChanged) onLanguageChanged()
+            }.onFailure {
+                Toast.makeText(context, R.string.restore_failed, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -115,6 +186,26 @@ fun SettingsScreen(
                     onClick = { showDownloadDialog = true }
                 )
                 SettingsDivider()
+                val folderName = remember(folderVersion) { DownloadStorage.displayName(context) }
+                SettingsRow(
+                    icon = Icons.Default.Folder,
+                    title = stringResource(R.string.settings_download_folder),
+                    subtitle = folderName.ifBlank { stringResource(R.string.app_folder) },
+                    onClick = { folderLauncher.launch(null) }
+                )
+                if (DownloadStorage.isEnabled()) {
+                    SettingsDivider()
+                    SettingsRow(
+                        icon = Icons.Default.Delete,
+                        title = stringResource(R.string.reset_folder),
+                        onClick = {
+                            DownloadStorage.clear()
+                            folderVersion++
+                            Toast.makeText(context, R.string.folder_reset, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+                SettingsDivider()
                 SettingsSwitchRow(
                     icon = Icons.Default.Notifications,
                     title = stringResource(R.string.settings_notifications),
@@ -135,6 +226,31 @@ fun SettingsScreen(
                         else -> stringResource(R.string.theme_system)
                     },
                     onClick = { showThemeDialog = true }
+                )
+            }
+        }
+
+        item {
+            SettingsSection(title = stringResource(R.string.settings_backup)) {
+                SettingsRow(
+                    icon = Icons.Default.Backup,
+                    title = stringResource(R.string.backup),
+                    subtitle = stringResource(R.string.backup_desc),
+                    onClick = {
+                        val stamp = SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(Date())
+                        backupLauncher.launch("snaptube-backup-$stamp.json")
+                    }
+                )
+                SettingsDivider()
+                SettingsRow(
+                    icon = Icons.Default.Restore,
+                    title = stringResource(R.string.restore),
+                    subtitle = stringResource(R.string.restore_desc),
+                    onClick = {
+                        restoreLauncher.launch(
+                            arrayOf("application/json", "text/plain", "text/*", "application/octet-stream")
+                        )
+                    }
                 )
             }
         }
@@ -573,7 +689,8 @@ private fun DownloadSettingsDialog(onDismiss: () -> Unit) {
 
                 Text(
                     text = stringResource(R.string.settings_download_dir) + ": " +
-                        (AppPreferences.downloadDir.ifBlank { "App/Download" }),
+                        DownloadStorage.displayName(LocalContext.current)
+                            .ifBlank { stringResource(R.string.app_folder) },
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -47,6 +47,7 @@ import androidx.core.content.ContextCompat
 import com.snaptube.clone.R
 import com.snaptube.clone.data.extractor.MediaRepository
 import com.snaptube.clone.data.model.DownloadTask
+import com.snaptube.clone.data.model.PlaylistDetails
 import com.snaptube.clone.data.model.VideoDetails
 import com.snaptube.clone.data.prefs.AppPreferences
 import com.snaptube.clone.download.DownloadManager
@@ -56,6 +57,7 @@ import com.snaptube.clone.ui.detail.VideoDetailScreen
 import com.snaptube.clone.ui.files.FilesScreen
 import com.snaptube.clone.ui.home.DownloadTabScreen
 import com.snaptube.clone.ui.player.PlayerScreen
+import com.snaptube.clone.ui.playlist.PlaylistScreen
 import com.snaptube.clone.ui.search.SearchResultsScreen
 import com.snaptube.clone.ui.settings.SettingsScreen
 import com.snaptube.clone.ui.theme.SnapTubeTheme
@@ -68,6 +70,7 @@ private sealed interface Route {
     data object Main : Route
     data class Search(val query: String) : Route
     data class Detail(val video: VideoDetails) : Route
+    data class Playlist(val playlist: PlaylistDetails) : Route
     data class Player(val path: String, val title: String, val isAudio: Boolean) : Route
     data class Web(val url: String) : Route
     data class Tool(val tool: String) : Route
@@ -162,7 +165,19 @@ private fun MainApp(
 
     fun openUrl(url: String) {
         if (url.isBlank()) return
-        if (MediaRepository.isSupportedUrl(url)) {
+        if (MediaRepository.isPlaylistUrl(url)) {
+            scope.launch {
+                isExtracting = true
+                extractingTitle = url
+                val result = MediaRepository.extractPlaylist(url)
+                isExtracting = false
+                result.onSuccess { route = Route.Playlist(it) }
+                    .onFailure {
+                        Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show()
+                        route = Route.Web(url)
+                    }
+            }
+        } else if (MediaRepository.isSupportedUrl(url)) {
             scope.launch {
                 isExtracting = true
                 extractingTitle = url
@@ -247,6 +262,15 @@ private fun MainApp(
                         onFormatSelected = { video, format ->
                             DownloadManager.enqueue(video, format)
                             Toast.makeText(context, R.string.download_started, Toast.LENGTH_SHORT).show()
+                            tabIndex = 1
+                            route = Route.Main
+                        }
+                    )
+
+                    is Route.Playlist -> PlaylistScreen(
+                        playlist = current.playlist,
+                        onBack = { route = Route.Main },
+                        onQueued = {
                             tabIndex = 1
                             route = Route.Main
                         }

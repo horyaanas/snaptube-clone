@@ -67,6 +67,28 @@ data class VideoDetails(
     val hasFormats: Boolean get() = formats.isNotEmpty()
 }
 
+/** A real playlist (YouTube playlist, SoundCloud set, channel, …). */
+data class PlaylistDetails(
+    val id: String,
+    val title: String,
+    val author: String,
+    val thumbnailUrl: String,
+    val webpageUrl: String,
+    val items: List<VideoDetails> = emptyList(),
+    val streamCount: Long = 0L
+) {
+    val count: Int get() = if (items.isNotEmpty()) items.size else streamCount.toInt()
+}
+
+/** A file discovered in the chosen SAF download folder. */
+data class StorageEntry(
+    val uri: String,
+    val name: String,
+    val sizeBytes: Long,
+    val lastModified: Long,
+    val mimeType: String
+)
+
 enum class DownloadStatus {
     QUEUED,
     DOWNLOADING,
@@ -82,7 +104,7 @@ data class DownloadTask(
     val author: String,
     val thumbnailUrl: String,
     val format: FormatOption,
-    val targetFilePath: String,
+    var targetFilePath: String,
     var totalBytes: Long = 0L,
     var downloadedBytes: Long = 0L,
     var progressPercent: Int = 0,
@@ -90,7 +112,9 @@ data class DownloadTask(
     var status: DownloadStatus = DownloadStatus.QUEUED,
     val mimeType: String = "video/mp4",
     val createdAt: Long = System.currentTimeMillis(),
-    var errorMessage: String? = null
+    var errorMessage: String? = null,
+    /** Original page URL, kept so the download can be repeated later. */
+    val sourceUrl: String = ""
 ) {
     val readableSpeed: String
         get() {

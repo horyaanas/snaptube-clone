@@ -11,6 +11,7 @@ import com.snaptube.clone.data.model.FormatOption
 import com.snaptube.clone.data.model.MediaType
 import com.snaptube.clone.data.model.VideoDetails
 import com.snaptube.clone.data.prefs.AppPreferences
+import com.snaptube.clone.data.storage.DownloadStorage
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -123,7 +124,8 @@ object DownloadManager {
             format = format,
             targetFilePath = finalFile.absolutePath,
             mimeType = mimeFor(format),
-            status = DownloadStatus.QUEUED
+            status = DownloadStatus.QUEUED,
+            sourceUrl = video.webpageUrl
         )
         _tasks.update { it + task }
         startTask(task.id)
@@ -167,7 +169,7 @@ object DownloadManager {
         activeJobs.remove(taskId)?.cancel()
         val task = _tasks.value.firstOrNull { it.id == taskId }
         task?.let {
-            File(it.targetFilePath).delete()
+            deletePath(it.targetFilePath)
             deleteTaskArtifacts(it)
         }
         _tasks.update { list -> list.filterNot { it.id == taskId } }
@@ -177,11 +179,19 @@ object DownloadManager {
     fun clearCompleted() {
         val completed = _tasks.value.filter { it.status == DownloadStatus.COMPLETED }
         completed.forEach { task ->
-            File(task.targetFilePath).delete()
+            deletePath(task.targetFilePath)
             deleteTaskArtifacts(task)
         }
         _tasks.update { list -> list.filterNot { it.status == DownloadStatus.COMPLETED } }
         saveHistory()
+    }
+
+    private fun deletePath(path: String) {
+        if (DownloadStorage.isContentUri(path)) {
+            DownloadStorage.delete(appContext, path)
+        } else {
+            runCatching { File(path).delete() }
+        }
     }
 
     fun rescanFile(path: String) {
@@ -229,13 +239,36 @@ object DownloadManager {
                 }
 
                 rescanFile(finalFile.absolutePath)
+                var savedPath = finalFile.absolutePath
+                var savedSize = finalFile.length()
+                var treeError: String? = null
+                if (DownloadStorage.isEnabled()) {
+                    try {
+                        val treeUri = DownloadStorage.copyToTree(
+                            appContext,
+                            finalFile,
+                            finalFile.name,
+                            mimeFor(format)
+                        )
+                        if (treeUri != null) {
+                            savedPath = treeUri.toString()
+                            savedSize = DownloadStorage.sizeOf(appContext, savedPath)
+                            finalFile.delete()
+                        }
+                    } catch (t: Throwable) {
+                        // Keep the local copy when the SAF folder becomes unavailable.
+                        treeError = t.message
+                    }
+                }
                 updateTask(taskId) {
                     it.copy(
+                        targetFilePath = savedPath,
                         status = DownloadStatus.COMPLETED,
                         progressPercent = 100,
-                        downloadedBytes = finalFile.length(),
-                        totalBytes = finalFile.length(),
-                        downloadSpeedBps = 0
+                        downloadedBytes = savedSize,
+                        totalBytes = savedSize,
+                        downloadSpeedBps = 0,
+                        errorMessage = treeError
                     )
                 }
                 saveHistory()
@@ -601,6 +634,7 @@ object DownloadManager {
     }
 
     private fun deleteTaskArtifacts(task: DownloadTask) {
+        if (DownloadStorage.isContentUri(task.targetFilePath)) return
         val finalFile = File(task.targetFilePath)
         val workingDir = tempDir()
         val baseName = finalFile.nameWithoutExtension
@@ -660,11 +694,41 @@ object DownloadManager {
     // Persistence
     // ------------------------------------------------------------------
 
-    private fun saveHistory() {
+    /** Serialised download history, used by the backup/restore feature. */
+    fun exportHistoryJson(): String = runCatching {
+        if (::appContext.isInitialized) historyToJson().toString() else "[]"
+    }.getOrDefault("[]")
+
+    /**
+     * Merges a previously exported history into the current queue. Existing
+     * entries with the same id win so active downloads are never clobbered.
+     */
+    fun importHistory(json: String) {
         if (!::appContext.isInitialized) return
         try {
-            val array = JSONArray()
-            _tasks.value.forEach { task ->
+            val imported = JSONArray(json)
+            val merged = historyToJson()
+            val knownIds = buildSet {
+                for (i in 0 until merged.length()) {
+                    merged.optJSONObject(i)?.optString("id")?.let { add(it) }
+                }
+            }
+            for (i in 0 until imported.length()) {
+                val obj = imported.optJSONObject(i) ?: continue
+                val id = obj.optString("id")
+                if (id.isNotBlank() && id !in knownIds) {
+                    merged.put(obj)
+                }
+            }
+            File(appContext.filesDir, HISTORY_FILE).writeText(merged.toString())
+            loadHistory()
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun historyToJson(): JSONArray {
+        val array = JSONArray()
+        _tasks.value.forEach { task ->
                 val obj = JSONObject()
                 obj.put("id", task.id)
                 obj.put("title", task.title)
@@ -678,6 +742,7 @@ object DownloadManager {
                 obj.put("mime", task.mimeType)
                 obj.put("created", task.createdAt)
                 obj.put("error", task.errorMessage ?: "")
+                obj.put("sourceUrl", task.sourceUrl)
 
                 val f = JSONObject()
                 f.put("id", task.format.id)
@@ -696,10 +761,15 @@ object DownloadManager {
                 f.put("audioLanguage", task.format.audioLanguage)
                 obj.put("format", f)
 
-                array.put(obj)
-            }
-            File(appContext.filesDir, HISTORY_FILE).writeText(array.toString())
-        } catch (_: Exception) {
+            array.put(obj)
+        }
+        return array
+    }
+
+    private fun saveHistory() {
+        if (!::appContext.isInitialized) return
+        runCatching {
+            File(appContext.filesDir, HISTORY_FILE).writeText(historyToJson().toString())
         }
     }
 
@@ -712,7 +782,8 @@ object DownloadManager {
             for (i in 0 until array.length()) {
                 val obj = array.optJSONObject(i) ?: continue
                 val path = obj.optString("path")
-                if (path.isBlank() || !File(path).exists()) continue
+                if (path.isBlank()) continue
+                if (!DownloadStorage.isContentUri(path) && !File(path).exists()) continue
 
                 val f = obj.optJSONObject("format") ?: continue
                 val format = FormatOption(
@@ -748,7 +819,8 @@ object DownloadManager {
                     status = status,
                     mimeType = obj.optString("mime", mimeFor(format)),
                     createdAt = obj.optLong("created", System.currentTimeMillis()),
-                    errorMessage = obj.optString("error").ifBlank { null }
+                    errorMessage = obj.optString("error").ifBlank { null },
+                    sourceUrl = obj.optString("sourceUrl")
                 )
             }
             _tasks.value = loaded

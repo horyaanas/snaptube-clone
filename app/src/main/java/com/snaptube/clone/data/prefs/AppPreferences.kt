@@ -20,6 +20,7 @@ object AppPreferences {
     private const val KEY_HISTORY = "search_history"
     private const val KEY_NOTIFICATIONS = "notifications"
     private const val KEY_DOWNLOAD_DIR = "download_dir"
+    private const val KEY_DOWNLOAD_TREE = "download_tree_uri"
 
     const val THEME_SYSTEM = 0
     const val THEME_LIGHT = 1
@@ -61,6 +62,11 @@ object AppPreferences {
     var downloadDir: String
         get() = p().getString(KEY_DOWNLOAD_DIR, "") ?: ""
         set(value) = p().edit().putString(KEY_DOWNLOAD_DIR, value).apply()
+
+    /** Persisted SAF tree URI chosen by the user, empty when using app storage. */
+    var downloadTreeUri: String
+        get() = p().getString(KEY_DOWNLOAD_TREE, "") ?: ""
+        set(value) = p().edit().putString(KEY_DOWNLOAD_TREE, value).apply()
 
     var languageTag: String
         get() = p().getString(KEY_LANGUAGE, "") ?: ""

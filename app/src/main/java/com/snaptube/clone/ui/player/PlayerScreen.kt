@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +37,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.snaptube.clone.R
+import com.snaptube.clone.player.AudioPlayerService
 import java.io.File
 
 @OptIn(UnstableApi::class)
@@ -48,9 +50,12 @@ fun PlayerScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val player = remember {
+    val mediaUri = remember(path) {
+        if (path.startsWith("content://")) Uri.parse(path) else Uri.fromFile(File(path))
+    }
+    val player = remember(mediaUri) {
         ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(Uri.fromFile(File(path))))
+            setMediaItem(MediaItem.fromUri(mediaUri))
             prepare()
             playWhenReady = true
         }
@@ -114,6 +119,31 @@ fun PlayerScreen(
                     else stringResource(R.string.download_as_video),
                     color = Color.White.copy(alpha = 0.7f),
                     fontSize = 11.sp
+                )
+            }
+            IconButton(
+                onClick = {
+                    val position = runCatching { player.currentPosition }.getOrDefault(0L)
+                    runCatching {
+                        AudioPlayerService.play(
+                            context = context,
+                            uri = mediaUri.toString(),
+                            title = title,
+                            positionMs = position
+                        )
+                        player.pause()
+                    }
+                    onBack()
+                },
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(Color.Black.copy(alpha = 0.45f))
+            ) {
+                Icon(
+                    Icons.Default.Headphones,
+                    contentDescription = stringResource(R.string.play_in_background),
+                    tint = Color.White
                 )
             }
         }

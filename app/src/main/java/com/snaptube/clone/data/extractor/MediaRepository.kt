@@ -2,6 +2,7 @@ package com.snaptube.clone.data.extractor
 
 import com.snaptube.clone.data.model.FormatOption
 import com.snaptube.clone.data.model.MediaType
+import com.snaptube.clone.data.model.PlaylistDetails
 import com.snaptube.clone.data.model.VideoDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,6 +13,7 @@ import org.schabi.newpipe.extractor.MediaFormat
 import org.schabi.newpipe.extractor.NewPipe
 import org.schabi.newpipe.extractor.ServiceList
 import org.schabi.newpipe.extractor.StreamingService
+import org.schabi.newpipe.extractor.playlist.PlaylistInfo
 import org.schabi.newpipe.extractor.search.SearchInfo
 import org.schabi.newpipe.extractor.stream.AudioStream
 import org.schabi.newpipe.extractor.stream.DeliveryMethod
@@ -64,12 +66,23 @@ object MediaRepository {
     fun isSupportedUrl(url: String): Boolean {
         val trimmed = url.trim()
         if (trimmed.isEmpty()) return false
+        if (SocialExtractor.isSupported(trimmed)) return true
         return try {
             NewPipe.getServiceByUrl(trimmed)
             true
         } catch (_: Exception) {
             false
         }
+    }
+
+    /** True for YouTube/SoundCloud links that contain a list/set of videos. */
+    fun isPlaylistUrl(url: String): Boolean {
+        val trimmed = url.trim().lowercase()
+        if (trimmed.isEmpty()) return false
+        val listLike = trimmed.contains("youtube.com/playlist") ||
+            (trimmed.contains("soundcloud.com/") && trimmed.contains("/sets/")) ||
+            trimmed.contains("bandcamp.com/album/")
+        return listLike && !trimmed.contains("watch?v=")
     }
 
     // ------------------------------------------------------------------
@@ -126,6 +139,9 @@ object MediaRepository {
     suspend fun extract(url: String): Result<VideoDetails> = withContext(Dispatchers.IO) {
         runCatching {
             val trimmed = url.trim()
+            if (SocialExtractor.isSupported(trimmed)) {
+                return@runCatching SocialExtractor.extract(trimmed)
+            }
             val service = try {
                 NewPipe.getServiceByUrl(trimmed)
             } catch (_: Exception) {
@@ -136,6 +152,29 @@ object MediaRepository {
             } else {
                 extractGenericWeb(trimmed)
             }
+        }
+    }
+
+    /** Extracts a real playlist and all of its first-page items. */
+    suspend fun extractPlaylist(url: String): Result<PlaylistDetails> = withContext(Dispatchers.IO) {
+        runCatching {
+            val trimmed = url.trim()
+            val service = NewPipe.getServiceByUrl(trimmed)
+            val info = PlaylistInfo.getInfo(service, trimmed)
+            val items = info.getRelatedItems()
+                .filterIsInstance<StreamInfoItem>()
+                .filter { it.getStreamType() != StreamType.AUDIO_STREAM }
+                .map { it.toVideoDetails(service.getServiceId()) }
+            PlaylistDetails(
+                id = info.getId() ?: trimmed.hashCode().toString(),
+                title = info.getName().orEmpty().ifBlank { "Playlist" },
+                author = info.getUploaderName().orEmpty()
+                    .ifBlank { service.getServiceInfo().getName() },
+                thumbnailUrl = bestThumbnail(info.getThumbnails()),
+                webpageUrl = trimmed,
+                items = items,
+                streamCount = info.getStreamCount()
+            )
         }
     }
 

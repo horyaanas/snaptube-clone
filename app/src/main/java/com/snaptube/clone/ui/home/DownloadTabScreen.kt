@@ -532,7 +532,7 @@ private fun MoreContent(
         Triple(R.string.phone_boost, R.drawable.ic_boost, "boost"),
         Triple(R.string.battery_saver, R.drawable.ic_battery, "battery"),
         Triple(R.string.large_files, R.drawable.ic_video, "large_files"),
-        Triple("Recover deleted", R.drawable.ic_download, "recover")
+        Triple(R.string.recover_deleted, R.drawable.ic_download, "recover")
     )
 
     Column(modifier = Modifier.fillMaxSize()) {

@@ -13,4 +13,12 @@
     <color name="snap_gray_text">#8A8A8E</color>
     <color name="snap_gray_light">#E6E6E6</color>
     <color name="snap_green">#00C853</color>
+
+    <!-- Icon colors referenced by the imported SnapTube vector drawables -->
+    <color name="icon_primary">#FFCD22</color>
+    <color name="content_main">#FFFFFF</color>
+    <color name="content_soft">#9E9E9E</color>
+    <color name="content_weak">#B0B0B0</color>
+    <color name="v5_icon_primary_color">#FFCD22</color>
+    <color name="v5_icon_secondary_color">#8A8A8A</color>
 </resources>

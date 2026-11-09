@@ -32,6 +32,12 @@ import java.util.regex.Pattern
 object MediaRepository {
 
     private val client = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header("User-Agent", NewPipeDownloader.USER_AGENT)
+                .build()
+            chain.proceed(request)
+        }
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(20, TimeUnit.SECONDS)
         .followRedirects(true)
@@ -160,12 +166,11 @@ object MediaRepository {
         val audioStreams = info.getAudioStreams()
             .filter { it.getDeliveryMethod() == DeliveryMethod.PROGRESSIVE_HTTP && !it.getUrl().isNullOrBlank() }
 
-        val bestAudio = audioStreams
-            .sortedWith(
-                compareByDescending<AudioStream> { it.getAverageBitrate() }
-                    .thenByDescending { it.getFormat() == MediaFormat.M4A }
-            )
-            .firstOrNull()
+        // MediaMuxer writes MP4: prefer an M4A audio track so the muxed
+        // container is valid even when a higher-bitrate Opus track exists.
+        val m4aAudio = audioStreams.filter { it.getFormat() == MediaFormat.M4A }
+        val bestAudio = (if (m4aAudio.isNotEmpty()) m4aAudio else audioStreams)
+            .maxByOrNull { it.getAverageBitrate() }
 
         // Audio-only formats
         audioStreams

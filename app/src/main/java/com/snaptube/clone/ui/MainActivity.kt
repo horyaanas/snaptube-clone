@@ -243,7 +243,13 @@ private fun MainApp(
                     is Route.Detail -> VideoDetailScreen(
                         video = current.video,
                         onBack = { route = Route.Main },
-                        onDownload = { videoForFormat = it }
+                        onDownload = { videoForFormat = it },
+                        onFormatSelected = { video, format ->
+                            DownloadManager.enqueue(video, format)
+                            Toast.makeText(context, R.string.download_started, Toast.LENGTH_SHORT).show()
+                            tabIndex = 1
+                            route = Route.Main
+                        }
                     )
 
                     is Route.Player -> PlayerScreen(

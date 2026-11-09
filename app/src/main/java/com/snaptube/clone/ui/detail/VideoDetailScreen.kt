@@ -56,6 +56,7 @@ fun VideoDetailScreen(
     video: VideoDetails,
     onBack: () -> Unit,
     onDownload: (VideoDetails) -> Unit,
+    onFormatSelected: (VideoDetails, FormatOption) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val audioFormats = video.formats.filter { it.type == MediaType.AUDIO }
@@ -162,7 +163,7 @@ fun VideoDetailScreen(
                 FormatRow(
                     format = videoFormats[index],
                     accent = SnapRed,
-                    onClick = { onDownload(video) }
+                    onClick = { onFormatSelected(video, videoFormats[index]) }
                 )
             }
         }
@@ -180,7 +181,7 @@ fun VideoDetailScreen(
                 FormatRow(
                     format = audioFormats[index],
                     accent = SnapYellow,
-                    onClick = { onDownload(video) }
+                    onClick = { onFormatSelected(video, audioFormats[index]) }
                 )
             }
         }
@@ -198,7 +199,7 @@ fun VideoDetailScreen(
                 FormatRow(
                     format = subtitleFormats[index],
                     accent = AccentBlue,
-                    onClick = { onDownload(video) }
+                    onClick = { onFormatSelected(video, subtitleFormats[index]) }
                 )
             }
         }

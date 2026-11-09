@@ -59,7 +59,17 @@ object DownloadManager {
     private const val CHUNK_MIN_SIZE = 2L * 1024 * 1024 // 2 MiB
     private const val HISTORY_FILE = "download_history.json"
 
+    private const val USER_AGENT =
+        "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+
     private val client = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header("User-Agent", USER_AGENT)
+                .build()
+            chain.proceed(request)
+        }
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)

@@ -122,7 +122,11 @@ fun VideoCard(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "${video.author} · 128K views · 2 days ago",
+                        text = buildString {
+                            append(video.author)
+                            if (video.viewCountText.isNotBlank()) append(" · ${video.viewCountText} views")
+                            if (video.uploadDateText.isNotBlank()) append(" · ${video.uploadDateText}")
+                        },
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

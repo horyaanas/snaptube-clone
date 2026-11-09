@@ -4,14 +4,17 @@ kotlin = "2.0.21"
 coreKtx = "1.15.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
+appcompat = "1.7.0"
 composeBom = "2024.11.00"
 navigationCompose = "2.8.4"
 media3 = "1.5.0"
 room = "2.6.1"
 coroutines = "1.9.0"
 okhttp = "4.12.0"
-jsoup = "1.18.3"
+jsoup = "1.23.2"
 coil = "2.7.0"
+newpipe = "v0.27.0"
+desugar = "2.1.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +44,15 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+# AppCompat (locale switching / DayNight)
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+# Streaming site extraction (YouTube, SoundCloud, PeerTube, Bandcamp, MediaCCC)
+newpipe-extractor = { group = "com.github.TeamNewPipe", name = "NewPipeExtractor", version.ref = "newpipe" }
+
+# Java 17 bytecode support (NewPipeExtractor is compiled with Java 17)
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

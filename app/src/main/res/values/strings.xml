@@ -1,26 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SnapTube</string>
-    <string name="tab_home">Home</string>
-    <string name="tab_browser">Browser</string>
-    <string name="tab_downloads">My Files</string>
-    <string name="tab_tools">Tools</string>
-    <string name="tab_me">Me</string>
 
-    <string name="search_hint">Search or enter URL...</string>
+    <!-- Bottom navigation -->
+    <string name="tab_download">Download</string>
+    <string name="tab_play">Play</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Home top tabs -->
+    <string name="home_search">Search</string>
+    <string name="home_youtube">YouTube</string>
+    <string name="home_music">Music</string>
+    <string name="home_more">More</string>
+    <string name="home_sub">Sub</string>
+
+    <!-- Search / home -->
+    <string name="search">Search</string>
+    <string name="search_hint">Search or paste a video link</string>
+    <string name="search_to_download">Search to download</string>
+    <string name="hot_searches">Hot searches</string>
+    <string name="search_history">Search history</string>
+    <string name="clear_history">Clear</string>
     <string name="trending">Trending</string>
-    <string name="recommended">Recommended For You</string>
-    <string name="speed_dial">Sites</string>
+    <string name="recommended">Recommended for you</string>
+    <string name="no_results">No results found</string>
+    <string name="loading">Loading…</string>
+    <string name="retry">Retry</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="no_network">No internet connection</string>
+
+    <!-- Sites / More -->
+    <string name="supported_sites">Supported sites</string>
+    <string name="speed_dial">Popular sites</string>
+    <string name="open_site">Open site</string>
 
     <!-- Formats -->
-    <string name="download_as_music">Music</string>
+    <string name="choose_format">Download as…</string>
+    <string name="download_as_music">Audio</string>
     <string name="download_as_video">Video</string>
-    <string name="format_mp3_128k">MP3 128K</string>
-    <string name="format_mp3_160k">MP3 160K</string>
-    <string name="format_m4a">M4A (128K)</string>
-    <string name="format_360p">360P</string>
-    <string name="format_720p">720P HD</string>
-    <string name="format_1080p">1080P FHD</string>
+    <string name="download_as_subtitle">Subtitles</string>
+    <string name="format_m4a">M4A</string>
+    <string name="format_mp3">MP3</string>
+    <string name="format_audio_only">Audio only</string>
+    <string name="format_size_unknown">Size unknown</string>
+    <string name="remember_choice">Remember my choice</string>
+    <string name="download">Download</string>
+    <string name="download_started">Download started</string>
 
     <!-- Downloads -->
     <string name="downloading">Downloading</string>
@@ -28,10 +53,71 @@
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="play">Play</string>
+    <string name="open">Open</string>
+    <string name="share">Share</string>
+    <string name="my_files">My Files</string>
+    <string name="empty_downloads">No active downloads</string>
+    <string name="empty_finished">No downloaded files yet</string>
+    <string name="empty_videos">No videos</string>
+    <string name="empty_audio">No audio files</string>
+    <string name="merge_failed">Could not merge video and audio</string>
+    <string name="download_failed">Download failed</string>
+    <string name="download_complete">Download complete</string>
+    <string name="storage_permission_needed">Storage permission is required to save files</string>
+
+    <!-- Settings -->
+    <string name="settings_general">General</string>
+    <string name="settings_download">Download</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_feedback">Feedback</string>
+    <string name="settings_share">Share app</string>
+    <string name="settings_about">About</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_download_tools">Download tools</string>
+    <string name="settings_phone_clean">Phone clean</string>
+    <string name="settings_info">Info</string>
+    <string name="settings_download_dir">Download folder</string>
+    <string name="settings_download_dir_desc">Choose where downloads are stored</string>
+    <string name="settings_wifi_only">Wi-Fi only</string>
+    <string name="settings_wifi_only_desc">Download only over Wi-Fi</string>
+    <string name="settings_threads">Parallel connections</string>
+    <string name="settings_threads_desc">Multi-threaded download acceleration</string>
+    <string name="settings_notifications_desc">Show download progress notifications</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="language_english">English</string>
+    <string name="language_arabic">العربية</string>
+    <string name="version">Version</string>
+    <string name="build_number">Build</string>
+    <string name="about_text">A modern, functional SnapTube-compatible downloader built with Jetpack Compose and NewPipeExtractor.</string>
 
     <!-- Tools -->
+    <string name="download_tools">Download tools</string>
+    <string name="recover_deleted">Recover deleted files</string>
     <string name="whatsapp_status_saver">WhatsApp Status Saver</string>
     <string name="vault_title">Private Vault</string>
-    <string name="clean_junk">Clean Junk Files</string>
+    <string name="phone_clean">Phone clean</string>
+    <string name="cleaner">Cleaner</string>
     <string name="phone_boost">Phone Boost</string>
+    <string name="battery_saver">Battery Saver</string>
+    <string name="large_files">Large Files</string>
+    <string name="trash">Trash</string>
+    <string name="whatsapp_clean">WhatsApp Clean</string>
+    <string name="photos">Photos</string>
+    <string name="app_uninstaller">App Uninstaller</string>
+    <string name="tool_coming_soon">This tool needs additional permissions and will be enabled in a later update.</string>
+    <string name="whatsapp_no_status">No WhatsApp statuses found</string>
+    <string name="vault_empty">Your private vault is empty</string>
+    <string name="clean_junk">Clean junk files</string>
+    <string name="clean_done">Cleanup complete</string>
+    <string name="scanning">Scanning…</string>
+    <string name="storage_used">Storage used</string>
+    <string name="storage_free">Free space</string>
+    <string name="clean_now">Clean now</string>
+    <string name="no_large_files">No large files found</string>
 </resources>

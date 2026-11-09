@@ -19,3 +19,6 @@
 
 # Retain original analyzed apk locally, ignore from git
 SnapTube_tube_snaptubecom.apk
+
+# Reverse-engineering workspace (decompiled sources, apktool output)
+.rea-out/

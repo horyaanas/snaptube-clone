@@ -59,7 +59,7 @@ class DownloadForegroundService : Service() {
         collectorJob?.cancel()
         collectorJob = scope.launch {
             DownloadManager.tasks.collectLatest { tasks ->
-                val activeTasks = tasks.filter { it.status == DownloadStatus.DOWNLOADING }
+                val activeTasks = tasks.filter { it.isActive }
                 if (activeTasks.isEmpty()) {
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
@@ -68,10 +68,10 @@ class DownloadForegroundService : Service() {
 
                 val current = activeTasks.first()
                 val notification = NotificationCompat.Builder(this@DownloadForegroundService, SnapTubeApp.CHANNEL_DOWNLOAD)
-                    .setContentTitle("Downloading: ${current.title}")
+                    .setContentTitle(current.title)
                     .setContentText("${current.progressPercent}% · ${current.readableSpeed}")
                     .setSmallIcon(android.R.drawable.stat_sys_download)
-                    .setProgress(100, current.progressPercent, false)
+                    .setProgress(100, current.progressPercent, current.progressPercent <= 0)
                     .setOngoing(true)
                     .build()
 

@@ -12,8 +12,8 @@ android {
         applicationId = "com.snaptube.clone"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "7.28.0.1"
+        versionCode = 76571601
+        versionName = "7.65.1.76571601"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -31,6 +31,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -39,11 +40,29 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/ASL2.0",
+                "META-INF/*.kotlin_module",
+                "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            )
+        }
     }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
@@ -65,4 +84,9 @@ dependencies {
     implementation(libs.jsoup)
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.coroutines.android)
+
+    // Real streaming-site extractors (YouTube, SoundCloud, PeerTube, Bandcamp, MediaCCC)
+    implementation(libs.newpipe.extractor)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

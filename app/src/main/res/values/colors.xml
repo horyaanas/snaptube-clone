@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- SnapTube Brand Palette -->
-    <color name="snap_yellow">#FFBB00</color>
-    <color name="snap_yellow_variant">#FFA000</color>
+    <!-- SnapTube brand palette extracted from the original APK -->
+    <color name="snap_yellow">#FFCD22</color>
+    <color name="snap_orange">#FFA100</color>
+    <color name="snap_blue">#3E8BFF</color>
+    <color name="snap_red">#FF4949</color>
     <color name="snap_black">#121212</color>
-    <color name="snap_dark_surface">#1E1E1E</color>
-    <color name="snap_card_dark">#282828</color>
-    <color name="snap_light_bg">#F6F7F9</color>
+    <color name="snap_surface_dark">#1B1B1B</color>
+    <color name="snap_card_dark">#242424</color>
+    <color name="snap_background_light">#F5F5F5</color>
     <color name="snap_white">#FFFFFF</color>
-    <color name="snap_gray_text">#8E8E93</color>
-    <color name="snap_gray_light">#E5E5EA</color>
-    <color name="snap_red_accent">#FF3B30</color>
-    <color name="snap_green_accent">#34C759</color>
+    <color name="snap_gray_text">#8A8A8E</color>
+    <color name="snap_gray_light">#E6E6E6</color>
+    <color name="snap_green">#00C853</color>
 </resources>

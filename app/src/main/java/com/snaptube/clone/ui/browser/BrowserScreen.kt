@@ -48,6 +48,7 @@ import com.snaptube.clone.ui.theme.SnapYellow
 @Composable
 fun BrowserScreen(
     initialUrl: String,
+    onBack: () -> Unit,
     onDownloadDetected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -68,7 +69,9 @@ fun BrowserScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { if (webView?.canGoBack() == true) webView?.goBack() },
+                onClick = {
+                    if (webView?.canGoBack() == true) webView?.goBack() else onBack()
+                },
                 modifier = Modifier.size(36.dp)
             ) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", modifier = Modifier.size(20.dp))

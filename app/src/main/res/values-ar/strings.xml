@@ -1,26 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">سناب تيوب</string>
-    <string name="tab_home">الرئيسية</string>
-    <string name="tab_browser">المتصفح</string>
-    <string name="tab_downloads">ملفاتي</string>
-    <string name="tab_tools">الأدوات</string>
-    <string name="tab_me">أنا</string>
 
-    <string name="search_hint">ابحث أو أدخل رابط الفيديو...</string>
-    <string name="trending">المحتوى الرائج</string>
+    <!-- Bottom navigation -->
+    <string name="tab_download">تنزيل</string>
+    <string name="tab_play">تشغيل</string>
+    <string name="tab_settings">الإعدادات</string>
+
+    <!-- Home top tabs -->
+    <string name="home_search">بحث</string>
+    <string name="home_youtube">YouTube</string>
+    <string name="home_music">الموسيقى</string>
+    <string name="home_more">المزيد</string>
+    <string name="home_sub">اشتراك</string>
+
+    <!-- Search / home -->
+    <string name="search">بحث</string>
+    <string name="search_hint">ابحث أو ألصق رابط فيديو</string>
+    <string name="search_to_download">ابحث للتنزيل</string>
+    <string name="hot_searches">عمليات بحث رائجة</string>
+    <string name="search_history">سجل البحث</string>
+    <string name="clear_history">مسح</string>
+    <string name="trending">الرائج</string>
     <string name="recommended">موصى به لك</string>
+    <string name="no_results">لا توجد نتائج</string>
+    <string name="loading">جارٍ التحميل…</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="error_generic">حدث خطأ ما. حاول مرة أخرى.</string>
+    <string name="no_network">لا يوجد اتصال بالإنترنت</string>
+
+    <!-- Sites / More -->
+    <string name="supported_sites">المواقع المدعومة</string>
     <string name="speed_dial">المواقع الشهيرة</string>
+    <string name="open_site">فتح الموقع</string>
 
     <!-- Formats -->
-    <string name="download_as_music">موسيقى</string>
+    <string name="choose_format">تنزيل بصيغة…</string>
+    <string name="download_as_music">صوت</string>
     <string name="download_as_video">فيديو</string>
-    <string name="format_mp3_128k">MP3 (128K) جودة عادية</string>
-    <string name="format_mp3_160k">MP3 (160K) جودة عالية</string>
-    <string name="format_m4a">M4A (128K) الأفضل للتشغيل على الهاتف</string>
-    <string name="format_360p">360P جودة منخفضة</string>
-    <string name="format_720p">720P HD عالية الدقة</string>
-    <string name="format_1080p">1080P FHD فائقة الدقة</string>
+    <string name="download_as_subtitle">ترجمة</string>
+    <string name="format_m4a">M4A</string>
+    <string name="format_mp3">MP3</string>
+    <string name="format_audio_only">صوت فقط</string>
+    <string name="format_size_unknown">الحجم غير معروف</string>
+    <string name="remember_choice">تذكر اختياري</string>
+    <string name="download">تنزيل</string>
+    <string name="download_started">بدأ التنزيل</string>
 
     <!-- Downloads -->
     <string name="downloading">قيد التنزيل</string>
@@ -28,10 +53,71 @@
     <string name="pause">إيقاف مؤقت</string>
     <string name="resume">استئناف</string>
     <string name="cancel">إلغاء</string>
+    <string name="delete">حذف</string>
+    <string name="play">تشغيل</string>
+    <string name="open">فتح</string>
+    <string name="share">مشاركة</string>
+    <string name="my_files">ملفاتي</string>
+    <string name="empty_downloads">لا توجد عمليات تنزيل نشطة</string>
+    <string name="empty_finished">لا توجد ملفات منزّلة بعد</string>
+    <string name="empty_videos">لا توجد فيديوهات</string>
+    <string name="empty_audio">لا توجد ملفات صوتية</string>
+    <string name="merge_failed">تعذر دمج الفيديو والصوت</string>
+    <string name="download_failed">فشل التنزيل</string>
+    <string name="download_complete">اكتمل التنزيل</string>
+    <string name="storage_permission_needed">مطلوب إذن التخزين لحفظ الملفات</string>
+
+    <!-- Settings -->
+    <string name="settings_general">عام</string>
+    <string name="settings_download">التنزيل</string>
+    <string name="settings_notifications">الإشعارات</string>
+    <string name="settings_theme">المظهر</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_feedback">الملاحظات</string>
+    <string name="settings_share">مشاركة التطبيق</string>
+    <string name="settings_about">حول</string>
+    <string name="settings_account">الحساب</string>
+    <string name="settings_download_tools">أدوات التنزيل</string>
+    <string name="settings_phone_clean">تنظيف الهاتف</string>
+    <string name="settings_info">معلومات</string>
+    <string name="settings_download_dir">مجلد التنزيل</string>
+    <string name="settings_download_dir_desc">اختر مكان حفظ التنزيلات</string>
+    <string name="settings_wifi_only">Wi-Fi فقط</string>
+    <string name="settings_wifi_only_desc">التنزيل عبر Wi-Fi فقط</string>
+    <string name="settings_threads">اتصالات متوازية</string>
+    <string name="settings_threads_desc">تسريع التنزيل متعدد الخيوط</string>
+    <string name="settings_notifications_desc">إظهار إشعارات تقدم التنزيل</string>
+    <string name="theme_system">افتراضي النظام</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="language_english">English</string>
+    <string name="language_arabic">العربية</string>
+    <string name="version">الإصدار</string>
+    <string name="build_number">البناء</string>
+    <string name="about_text">تنزيل فيديوهات حديث وعملي متوافق مع سناب تيوب، مبني باستخدام Jetpack Compose وNewPipeExtractor.</string>
 
     <!-- Tools -->
+    <string name="download_tools">أدوات التنزيل</string>
+    <string name="recover_deleted">استعادة الملفات المحذوفة</string>
     <string name="whatsapp_status_saver">حافظ حالات واتساب</string>
     <string name="vault_title">الخزنة الخاصة</string>
-    <string name="clean_junk">تنظيف الملفات غير الهامة</string>
+    <string name="phone_clean">تنظيف الهاتف</string>
+    <string name="cleaner">المنظف</string>
     <string name="phone_boost">تسريع الهاتف</string>
+    <string name="battery_saver">موفر البطارية</string>
+    <string name="large_files">الملفات الكبيرة</string>
+    <string name="trash">سلة المهملات</string>
+    <string name="whatsapp_clean">تنظيف واتساب</string>
+    <string name="photos">الصور</string>
+    <string name="app_uninstaller">إزالة التطبيقات</string>
+    <string name="tool_coming_soon">تحتاج هذه الأداة إلى أذونات إضافية وسيتم تفعيلها في تحديث لاحق.</string>
+    <string name="whatsapp_no_status">لا توجد حالات واتساب</string>
+    <string name="vault_empty">الخزنة الخاصة فارغة</string>
+    <string name="clean_junk">تنظيف الملفات غير الهامة</string>
+    <string name="clean_done">اكتمل التنظيف</string>
+    <string name="scanning">جارٍ الفحص…</string>
+    <string name="storage_used">المساحة المستخدمة</string>
+    <string name="storage_free">المساحة المتاحة</string>
+    <string name="clean_now">تنظيف الآن</string>
+    <string name="no_large_files">لا توجد ملفات كبيرة</string>
 </resources>

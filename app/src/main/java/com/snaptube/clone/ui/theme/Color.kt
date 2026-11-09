@@ -2,25 +2,30 @@ package com.snaptube.clone.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val SnapYellow = Color(0xFFFFBB00)
-val SnapYellowDark = Color(0xFFFFA000)
+// Exact SnapTube brand palette (res/values/colors.xml in the original APK)
+val SnapYellow = Color(0xFFFFCD22)
+val SnapYellowDark = Color(0xFFFFA100)
 val SnapYellowLight = Color(0xFFFFE082)
 
-val DarkBackground = Color(0xFF121212)
-val DarkSurface = Color(0xFF1E1E1E)
-val DarkCard = Color(0xFF282828)
-val DarkBorder = Color(0xFF383838)
+val SnapBlue = Color(0xFF3E8BFF)
+val SnapRed = Color(0xFFFF4949)
+val SnapGreen = Color(0xFF00C853)
 
-val LightBackground = Color(0xFFF6F7F9)
+val DarkBackground = Color(0xFF121212)
+val DarkSurface = Color(0xFF1B1B1B)
+val DarkCard = Color(0xFF242424)
+val DarkBorder = Color(0xFF353535)
+
+val LightBackground = Color(0xFFF5F5F5)
 val LightSurface = Color(0xFFFFFFFF)
 val LightCard = Color(0xFFFFFFFF)
-val LightBorder = Color(0xFFE5E5EA)
+val LightBorder = Color(0xFFE6E6E6)
 
 val TextPrimaryDark = Color(0xFFFFFFFF)
-val TextSecondaryDark = Color(0xFFAAAAAA)
+val TextSecondaryDark = Color(0xFFB0B0B0)
 val TextPrimaryLight = Color(0xFF1A1A1A)
-val TextSecondaryLight = Color(0xFF757575)
+val TextSecondaryLight = Color(0xFF6B6B6B)
 
-val AccentRed = Color(0xFFFF3B30)
-val AccentGreen = Color(0xFF34C759)
-val AccentBlue = Color(0xFF007AFF)
+val AccentRed = SnapRed
+val AccentGreen = SnapGreen
+val AccentBlue = SnapBlue

@@ -115,7 +115,7 @@ fun ToolScreen(
             "photos" -> PhotosTool(onPlay = onPlay)
             "uninstaller" -> UninstallerTool()
             "account" -> AccountTool()
-            else -> ToolInfo(stringResource(R.string.tool_coming_soon))
+            else -> ToolInfoScreen(stringResource(R.string.tool_coming_soon))
         }
     }
 }
@@ -797,6 +797,17 @@ private fun UninstallerTool() {
 // ----------------------------------------------------------------------
 // Account / info
 // ----------------------------------------------------------------------
+
+@Composable
+private fun ToolInfoScreen(message: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(
+            text = message,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 14.sp
+        )
+    }
+}
 
 @Composable
 private fun AccountTool() {

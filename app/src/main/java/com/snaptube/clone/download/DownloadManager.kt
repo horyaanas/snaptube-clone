@@ -331,12 +331,12 @@ object DownloadManager {
     ): Job {
         val parent = currentCoroutineContext()[Job]
         return CoroutineScope(Dispatchers.Default + (parent ?: SupervisorJob())).launch {
-            var lastBytes = tracker.value
+            var lastBytes = tracker.value.get()
             var lastTime = System.currentTimeMillis()
             while (isActive) {
                 delay(300)
                 val now = System.currentTimeMillis()
-                val bytes = tracker.value
+                val bytes = tracker.value.get()
                 val elapsed = max(1L, now - lastTime)
                 val speed = ((bytes - lastBytes) * 1000L) / elapsed
                 lastBytes = bytes
